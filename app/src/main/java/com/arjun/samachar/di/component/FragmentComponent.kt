@@ -3,6 +3,7 @@ package com.arjun.samachar.di.component
 import com.arjun.samachar.di.FragmentScope
 import com.arjun.samachar.di.module.FragmentModule
 import com.arjun.samachar.ui.home.HomeFragment
+import com.arjun.samachar.ui.search.SearchFragment
 import dagger.Component
 
 @FragmentScope
@@ -10,5 +11,7 @@ import dagger.Component
 interface FragmentComponent {
 
     fun inject(fragment: HomeFragment)
+
+    fun inject(fragment: SearchFragment)
 
 }

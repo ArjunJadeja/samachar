@@ -35,6 +35,7 @@ class ApplicationModule(private val application: App) {
 
         return Retrofit.Builder()
             .baseUrl(baseUrl)
+            .client(client)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
             .create(NetworkService::class.java)
