@@ -1,7 +1,12 @@
 package com.arjun.samachar.data.repository
 
 import com.arjun.samachar.data.api.NetworkService
+import com.arjun.samachar.data.model.Country
 import com.arjun.samachar.data.model.Headline
+import com.arjun.samachar.data.model.Language
+import com.arjun.samachar.data.model.Source
+import com.arjun.samachar.utils.CountryHelper
+import com.arjun.samachar.utils.LanguageHelper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -11,6 +16,14 @@ import javax.inject.Singleton
 @Singleton
 class MainRepository @Inject constructor(private val networkService: NetworkService) {
 
+    fun getAllCountries(): Flow<List<Country>> {
+        return flow { emit(CountryHelper.getCountries()) }.map { it.countries }
+    }
+
+    fun getAllLanguages(): Flow<List<Language>> {
+        return flow { emit(LanguageHelper.getAllLanguages()) }
+    }
+
     fun getHeadlinesByCountry(countryCode: String): Flow<List<Headline>> {
         return flow { emit(networkService.getHeadlinesByCountry(countryCode = countryCode)) }
             .map { it.headlines }
@@ -18,6 +31,26 @@ class MainRepository @Inject constructor(private val networkService: NetworkServ
 
     fun search(query: String): Flow<List<Headline>> {
         return flow { emit(networkService.search(query = query)) }.map { it.headlines }
+    }
+
+    fun getHeadlinesBySource(sourceId: String): Flow<List<Headline>> {
+        return flow { emit(networkService.getHeadlinesBySource(sourceId = sourceId)) }.map { it.headlines }
+    }
+
+    fun getHeadlinesByLanguage(countryCode: String, languageCode: String): Flow<List<Headline>> {
+        return flow {
+            emit(
+                networkService.getHeadlinesByLanguage(
+                    countryCode = countryCode,
+                    languageCode = languageCode
+                )
+            )
+        }.map { it.headlines }
+    }
+
+    fun getSources(countryCode: String): Flow<List<Source>> {
+        return flow { emit(networkService.getSources(countryCode = countryCode)) }
+            .map { it.sources }
     }
 
 }

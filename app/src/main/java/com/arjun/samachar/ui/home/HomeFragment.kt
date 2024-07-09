@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,14 +18,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arjun.samachar.App
 import com.arjun.samachar.R
 import com.arjun.samachar.data.model.Headline
+import com.arjun.samachar.data.model.HeadlinesParams
 import com.arjun.samachar.databinding.FragmentHomeBinding
 import com.arjun.samachar.di.component.DaggerFragmentComponent
 import com.arjun.samachar.di.module.FragmentModule
 import com.arjun.samachar.ui.MainViewModel
 import com.arjun.samachar.ui.base.UiState
-import com.arjun.samachar.utils.AppConstants.DEFAULT_COUNTRY_CODE
+import com.arjun.samachar.ui.country.CountriesBottomSheet
+import com.arjun.samachar.ui.language.LanguagesBottomSheet
+import com.arjun.samachar.ui.source.SourcesBottomSheet
+import com.arjun.samachar.utils.AppConstants.DEFAULT_LANGUAGE_CODE
+import com.arjun.samachar.utils.AppConstants.DEFAULT_SOURCE
 import com.arjun.samachar.utils.AppConstants.DIALOG_ERROR_HEADER
+import com.arjun.samachar.utils.AppConstants.DIALOG_NETWORK_ERROR
 import com.arjun.samachar.utils.AppConstants.SCROLLING_THRESH_HOLD
+import com.arjun.samachar.utils.AppConstants.TOAST_NETWORK_ERROR
 import com.arjun.samachar.utils.UiHelper
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,6 +50,15 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var headlinesAdapter: HeadlinesAdapter
+
+    @Inject
+    lateinit var languagesBottomSheet: LanguagesBottomSheet
+
+    @Inject
+    lateinit var countriesBottomSheet: CountriesBottomSheet
+
+    @Inject
+    lateinit var sourcesBottomSheet: SourcesBottomSheet
 
     @Inject
     lateinit var customTabsIntent: CustomTabsIntent
@@ -62,16 +79,64 @@ class HomeFragment : Fragment() {
         observeNetworkStatus()
         setupHeadlinesRecyclerview()
         observeNewsList()
+        observeHeadlinesParamChanges()
         binding.apply {
             swipeRefreshLayout.setOnRefreshListener {
-                viewModel.getHeadlinesByCountry(countryCode = DEFAULT_COUNTRY_CODE)
+                fetchNews(mainViewModel.headlinesParams.value)
                 swipeRefreshLayout.isRefreshing = false
             }
             backToTopButton.setOnClickListener {
                 headlinesRecyclerView.smoothScrollToPosition(0)
             }
             searchNews.setOnClickListener {
+                mainViewModel.apply {
+                    clearSelectedLanguage()
+                    clearSelectedSource()
+                }
                 findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
+            }
+            selectLanguage.setOnClickListener {
+                showLanguagesBottomSheet()
+            }
+            selectCountry.setOnClickListener {
+                showCountriesBottomSheet()
+            }
+            selectSourceButton.setOnClickListener {
+                showSourcesBottomSheet()
+            }
+        }
+    }
+
+    private fun observeHeadlinesParamChanges() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.headlinesParams.collect {
+                    binding.selectCountry.text = it.selectedCountry.flag
+                    fetchNews(it)
+                }
+            }
+        }
+    }
+
+    private fun fetchNews(headlinesParams: HeadlinesParams) {
+        viewModel.apply {
+            clearHeadlineList()
+            binding.progressIndicator.visibility = View.VISIBLE
+            when {
+                headlinesParams.selectedLanguageCode != DEFAULT_LANGUAGE_CODE -> {
+                    getHeadlinesByLanguage(
+                        languageCode = headlinesParams.selectedLanguageCode,
+                        countryCode = headlinesParams.selectedCountry.code
+                    )
+                }
+
+                headlinesParams.selectedSourceId != DEFAULT_SOURCE -> {
+                    getHeadlinesBySource(sourceId = headlinesParams.selectedSourceId)
+                }
+
+                else -> {
+                    getHeadlinesByCountry(countryCode = headlinesParams.selectedCountry.code)
+                }
             }
         }
     }
@@ -106,14 +171,14 @@ class HomeFragment : Fragment() {
 
                         is UiState.Error -> {
                             binding.apply {
-                                progressIndicator.visibility = View.GONE
                                 swipeRefreshLayout.visibility = View.GONE
+                                progressIndicator.visibility = View.GONE
                             }
                             UiHelper.showApiRetryAlert(
                                 context = requireContext(),
                                 header = DIALOG_ERROR_HEADER,
-                                message = it.message
-                            ) { viewModel.getHeadlinesByCountry(countryCode = DEFAULT_COUNTRY_CODE) }
+                                message = if (networkConnected) it.message else DIALOG_NETWORK_ERROR
+                            ) { fetchNews(mainViewModel.headlinesParams.value) }
                         }
                     }
                 }
@@ -144,6 +209,30 @@ class HomeFragment : Fragment() {
                     }
                 }
             })
+        }
+    }
+
+    private fun showLanguagesBottomSheet() {
+        if (networkConnected) {
+            languagesBottomSheet.show(parentFragmentManager, LanguagesBottomSheet.TAG)
+        } else {
+            Toast.makeText(requireContext(), TOAST_NETWORK_ERROR, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showCountriesBottomSheet() {
+        if (networkConnected) {
+            countriesBottomSheet.show(parentFragmentManager, CountriesBottomSheet.TAG)
+        } else {
+            Toast.makeText(requireContext(), TOAST_NETWORK_ERROR, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showSourcesBottomSheet() {
+        if (networkConnected) {
+            sourcesBottomSheet.show(parentFragmentManager, SourcesBottomSheet.TAG)
+        } else {
+            Toast.makeText(requireContext(), TOAST_NETWORK_ERROR, Toast.LENGTH_SHORT).show()
         }
     }
 

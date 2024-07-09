@@ -1,6 +1,7 @@
 package com.arjun.samachar.data.api
 
 import com.arjun.samachar.data.model.HeadlinesResponse
+import com.arjun.samachar.data.model.SourcesResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 import javax.inject.Singleton
@@ -12,6 +13,22 @@ interface NetworkService {
     suspend fun getHeadlinesByCountry(
         @Query("country") countryCode: String
     ): HeadlinesResponse
+
+    @GET("top-headlines")
+    suspend fun getHeadlinesBySource(
+        @Query("sources") sourceId: String
+    ): HeadlinesResponse
+
+    @GET("top-headlines")
+    suspend fun getHeadlinesByLanguage(
+        @Query("country") countryCode: String,
+        @Query("language") languageCode: String
+    ): HeadlinesResponse
+
+    @GET("top-headlines/sources")
+    suspend fun getSources(
+        @Query("country") countryCode: String
+    ): SourcesResponse
 
     @GET("everything")
     suspend fun search(
