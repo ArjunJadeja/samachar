@@ -1,4 +1,4 @@
-package com.arjun.samachar.ui.home
+package com.arjun.samachar.ui.search
 
 import android.net.Uri
 import android.os.Bundle
@@ -13,38 +13,41 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.arjun.samachar.App
-import com.arjun.samachar.R
 import com.arjun.samachar.data.model.Headline
-import com.arjun.samachar.databinding.FragmentHomeBinding
+import com.arjun.samachar.databinding.FragmentSearchBinding
 import com.arjun.samachar.di.component.DaggerFragmentComponent
 import com.arjun.samachar.di.module.FragmentModule
 import com.arjun.samachar.ui.MainViewModel
 import com.arjun.samachar.ui.base.UiState
-import com.arjun.samachar.utils.AppConstants.DEFAULT_COUNTRY_CODE
+import com.arjun.samachar.ui.home.HeadlinesAdapter
 import com.arjun.samachar.utils.AppConstants.DIALOG_ERROR_HEADER
-import com.arjun.samachar.utils.AppConstants.SCROLLING_THRESH_HOLD
+import com.arjun.samachar.utils.AppConstants.DIALOG_NETWORK_ERROR
 import com.arjun.samachar.utils.UiHelper
+import com.arjun.samachar.utils.getQueryTextChangeStateFlow
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class HomeFragment : Fragment() {
+class SearchFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
+    private var _binding: FragmentSearchBinding? = null
 
     private val binding get() = _binding!!
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
-    lateinit var viewModel: HomeViewModel
-
-    @Inject
-    lateinit var headlinesAdapter: HeadlinesAdapter
+    lateinit var viewModel: SearchViewModel
 
     @Inject
     lateinit var customTabsIntent: CustomTabsIntent
+
+    @Inject
+    lateinit var headlinesAdapter: HeadlinesAdapter
 
     private var networkConnected = true
 
@@ -52,7 +55,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -61,59 +64,77 @@ class HomeFragment : Fragment() {
         injectDependencies()
         observeNetworkStatus()
         setupHeadlinesRecyclerview()
-        observeNewsList()
-        binding.apply {
-            swipeRefreshLayout.setOnRefreshListener {
-                viewModel.getHeadlinesByCountry(countryCode = DEFAULT_COUNTRY_CODE)
-                swipeRefreshLayout.isRefreshing = false
-            }
-            backToTopButton.setOnClickListener {
-                headlinesRecyclerView.smoothScrollToPosition(0)
-            }
-            searchNews.setOnClickListener {
-                findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
+        setupObserver()
+        setupSearch()
+        binding.backButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun setupSearch() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                binding.searchView.getQueryTextChangeStateFlow()
+                    .debounce(300)
+                    .filter { it.isNotBlank() }
+                    .distinctUntilChanged()
+                    .collect { query ->
+                        viewModel.apply {
+                            updateQueryText(query = query)
+                            search(query = query)
+                        }
+                    }
             }
         }
     }
 
-    private fun observeNewsList() {
+    private fun setupHeadlinesRecyclerview() {
+        headlinesAdapter.setHeadlineHandler { headline ->
+            customTabsIntent.launchUrl(requireContext(), Uri.parse(headline.url))
+        }
+        binding.searchResultsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = headlinesAdapter
+        }
+    }
+
+    private fun setupObserver() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.headlineList.collect {
+                viewModel.uiState.collect {
                     when (it) {
                         is UiState.Success -> {
                             binding.progressIndicator.visibility = View.GONE
                             if (it.data.isEmpty()) {
                                 binding.apply {
-                                    swipeRefreshLayout.visibility = View.GONE
+                                    searchResultsRecyclerView.visibility = View.GONE
                                     emptyListLayout.visibility = View.VISIBLE
                                 }
                             } else {
                                 updateHeadlineList(it.data)
                                 binding.apply {
                                     emptyListLayout.visibility = View.GONE
-                                    swipeRefreshLayout.visibility = View.VISIBLE
+                                    searchResultsRecyclerView.visibility = View.VISIBLE
                                 }
                             }
                         }
 
                         is UiState.Loading -> {
                             binding.apply {
-                                swipeRefreshLayout.visibility = View.GONE
+                                searchResultsRecyclerView.visibility = View.GONE
                                 progressIndicator.visibility = View.VISIBLE
                             }
                         }
 
                         is UiState.Error -> {
-                            binding.apply {
-                                progressIndicator.visibility = View.GONE
-                                swipeRefreshLayout.visibility = View.GONE
-                            }
+                            binding.progressIndicator.visibility = View.GONE
                             UiHelper.showApiRetryAlert(
                                 context = requireContext(),
                                 header = DIALOG_ERROR_HEADER,
-                                message = it.message
-                            ) { viewModel.getHeadlinesByCountry(countryCode = DEFAULT_COUNTRY_CODE) }
+                                message = if (networkConnected) it.message
+                                else DIALOG_NETWORK_ERROR
+                            ) { viewModel.search(query = viewModel.queryText.value) }
                         }
                     }
                 }
@@ -123,28 +144,6 @@ class HomeFragment : Fragment() {
 
     private fun updateHeadlineList(headlineList: List<Headline>) {
         headlinesAdapter.updateData(headlineList)
-    }
-
-    private fun setupHeadlinesRecyclerview() {
-        headlinesAdapter.setHeadlineHandler { headline ->
-            customTabsIntent.launchUrl(requireContext(), Uri.parse(headline.url))
-        }
-        binding.apply {
-            headlinesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            headlinesRecyclerView.adapter = headlinesAdapter
-            headlinesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-                    if (dy > 0 && firstVisibleItemPosition > SCROLLING_THRESH_HOLD) {
-                        backToTopButton.visibility = View.VISIBLE
-                    } else if (dy < 0) {
-                        backToTopButton.visibility = View.GONE
-                    }
-                }
-            })
-        }
     }
 
     private fun observeNetworkStatus() {
@@ -172,9 +171,9 @@ class HomeFragment : Fragment() {
     private fun injectDependencies() {
         DaggerFragmentComponent.builder()
             .applicationComponent((requireActivity().application as App).applicationComponent)
-            .fragmentModule(FragmentModule(this@HomeFragment))
+            .fragmentModule(FragmentModule(this@SearchFragment))
             .build()
-            .inject(this@HomeFragment)
+            .inject(this@SearchFragment)
     }
 
     override fun onDestroyView() {
