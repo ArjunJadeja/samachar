@@ -1,8 +1,12 @@
 package com.arjun.samachar.data.repository
 
 import com.arjun.samachar.data.api.NetworkService
+import com.arjun.samachar.data.model.Country
 import com.arjun.samachar.data.model.Headline
+import com.arjun.samachar.data.model.Language
 import com.arjun.samachar.data.model.Source
+import com.arjun.samachar.utils.CountryHelper
+import com.arjun.samachar.utils.LanguageHelper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -11,6 +15,14 @@ import javax.inject.Singleton
 
 @Singleton
 class MainRepository @Inject constructor(private val networkService: NetworkService) {
+
+    fun getAllCountries(): Flow<List<Country>> {
+        return flow { emit(CountryHelper.getCountries()) }.map { it.countries }
+    }
+
+    fun getAllLanguages(): Flow<List<Language>> {
+        return flow { emit(LanguageHelper.getAllLanguages()) }
+    }
 
     fun getHeadlinesByCountry(countryCode: String): Flow<List<Headline>> {
         return flow { emit(networkService.getHeadlinesByCountry(countryCode = countryCode)) }
