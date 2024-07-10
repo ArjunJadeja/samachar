@@ -5,14 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.arjun.samachar.data.model.Country
 import com.arjun.samachar.data.repository.MainRepository
 import com.arjun.samachar.ui.base.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CountriesViewModel(private val repository: MainRepository) : ViewModel() {
+@HiltViewModel
+class CountriesViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
 
     private val _countryList = MutableStateFlow<UiState<List<Country>>>(UiState.Loading)
 

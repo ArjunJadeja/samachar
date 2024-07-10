@@ -5,14 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.arjun.samachar.data.model.Language
 import com.arjun.samachar.data.repository.MainRepository
 import com.arjun.samachar.ui.base.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LanguageViewModel(private val repository: MainRepository) : ViewModel() {
+@HiltViewModel
+class LanguageViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
 
     private val _languageList = MutableStateFlow<UiState<List<Language>>>(UiState.Loading)
 

@@ -5,11 +5,14 @@ import com.arjun.samachar.data.model.Country
 import com.arjun.samachar.data.model.HeadlinesParams
 import com.arjun.samachar.utils.AppConstants.DEFAULT_LANGUAGE_CODE
 import com.arjun.samachar.utils.AppConstants.DEFAULT_SOURCE
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class MainViewModel : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor() : ViewModel() {
 
     // Network Status
     private val _isNetworkConnected = MutableStateFlow(false)

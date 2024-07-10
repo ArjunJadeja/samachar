@@ -9,13 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.arjun.samachar.ui.MainViewModel
-import com.arjun.samachar.ui.filters.country.CountriesViewModel
 import com.arjun.samachar.ui.headlines.home.HomeScreen
-import com.arjun.samachar.ui.headlines.home.HomeViewModel
-import com.arjun.samachar.ui.filters.language.LanguageViewModel
 import com.arjun.samachar.ui.headlines.search.SearchScreen
-import com.arjun.samachar.ui.headlines.search.SearchViewModel
-import com.arjun.samachar.ui.filters.source.SourcesViewModel
 
 sealed class Route(val name: String) {
     data object HomeScreen : Route(name = "home_screen")
@@ -25,11 +20,6 @@ sealed class Route(val name: String) {
 @Composable
 fun AppNavHost(
     mainViewModel: MainViewModel,
-    homeViewModel: HomeViewModel,
-    searchViewModel: SearchViewModel,
-    languageViewModel: LanguageViewModel,
-    countriesViewModel: CountriesViewModel,
-    sourcesViewModel: SourcesViewModel,
     customTabsIntent: CustomTabsIntent
 ) {
     val navController = rememberNavController()
@@ -43,11 +33,7 @@ fun AppNavHost(
             HomeScreen(
                 context = context,
                 navController = navController,
-                mainViewModel = mainViewModel,
-                homeViewModel = homeViewModel,
-                languageViewModel = languageViewModel,
-                countriesViewModel = countriesViewModel,
-                sourcesViewModel = sourcesViewModel
+                mainViewModel = mainViewModel
             ) {
                 openCustomChromeTab(
                     customTabsIntent = customTabsIntent,
@@ -59,8 +45,7 @@ fun AppNavHost(
         composable(route = Route.SearchScreen.name) {
             SearchScreen(
                 navController = navController,
-                mainViewModel = mainViewModel,
-                searchViewModel = searchViewModel
+                mainViewModel = mainViewModel
             ) {
                 openCustomChromeTab(
                     customTabsIntent = customTabsIntent,
