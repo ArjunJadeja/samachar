@@ -14,12 +14,4 @@ object AppConstants {
 
     const val DEFAULT_SOURCE = "All"
 
-    const val SCROLLING_THRESH_HOLD = 2
-
-    const val DIALOG_ERROR_HEADER = "Error Occurred!"
-
-    const val DIALOG_NETWORK_ERROR = "No internet connection. Try again later"
-
-    const val TOAST_NETWORK_ERROR = "No internet connection"
-
 }

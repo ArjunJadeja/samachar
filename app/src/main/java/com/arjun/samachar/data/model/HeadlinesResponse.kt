@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HeadlinesResponse(
     @SerialName("status")
-    val status: String? = null,
+    val status: String = "",
     @SerialName("totalResults")
-    val totalResults: Int? = null,
+    val totalResults: Int = 0,
     @SerialName("articles")
     val headlines: List<Headline> = ArrayList(),
 )
@@ -16,17 +16,17 @@ data class HeadlinesResponse(
 @Serializable
 data class Headline(
     @SerialName("author")
-    val author: String? = null,
+    val author: String = "",
     @SerialName("title")
-    val title: String? = null,
+    val title: String = "",
     @SerialName("description")
-    val description: String? = null,
+    val description: String = "",
     @SerialName("url")
-    val url: String? = null,
+    val url: String = "",
     @SerialName("urlToImage")
-    val imageUrl: String? = null,
+    val imageUrl: String = "",
     @SerialName("publishedAt")
-    val publishedAt: String? = null,
+    val publishedAt: String = "",
     @SerialName("source")
     val source: Source? = null
 )

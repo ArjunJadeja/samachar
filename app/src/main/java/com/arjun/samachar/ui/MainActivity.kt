@@ -1,39 +1,72 @@
 package com.arjun.samachar.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.arjun.samachar.App
-import com.arjun.samachar.databinding.ActivityMainBinding
 import com.arjun.samachar.di.component.DaggerActivityComponent
 import com.arjun.samachar.di.module.ActivityModule
+import com.arjun.samachar.ui.base.AppNavHost
+import com.arjun.samachar.ui.filters.country.CountriesViewModel
+import com.arjun.samachar.ui.headlines.home.HomeViewModel
+import com.arjun.samachar.ui.filters.language.LanguageViewModel
+import com.arjun.samachar.ui.headlines.search.SearchViewModel
+import com.arjun.samachar.ui.filters.source.SourcesViewModel
+import com.arjun.samachar.ui.theme.AppTheme
 import com.arjun.samachar.utils.network.NetworkConnected
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
-
-    private var _binding: ActivityMainBinding? = null
-
-    private val binding get() = _binding!!
+class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var viewModel: MainViewModel
+    lateinit var mainViewModel: MainViewModel
+
+    @Inject
+    lateinit var homeViewModel: HomeViewModel
+
+    @Inject
+    lateinit var searchViewModel: SearchViewModel
+
+    @Inject
+    lateinit var languageViewModel: LanguageViewModel
+
+    @Inject
+    lateinit var countriesViewModel: CountriesViewModel
+
+    @Inject
+    lateinit var sourcesViewModel: SourcesViewModel
 
     @Inject
     lateinit var networkConnected: NetworkConnected
+
+    @Inject
+    lateinit var customTabsIntent: CustomTabsIntent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injectDependencies()
         super.onCreate(savedInstanceState)
         installSplashScreen()
-        _binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         observeNetworkChanges()
+        setContent {
+            AppTheme {
+                AppNavHost(
+                    mainViewModel = mainViewModel,
+                    homeViewModel = homeViewModel,
+                    searchViewModel = searchViewModel,
+                    languageViewModel = languageViewModel,
+                    countriesViewModel = countriesViewModel,
+                    sourcesViewModel = sourcesViewModel,
+                    customTabsIntent = customTabsIntent
+                )
+            }
+        }
     }
 
     private fun observeNetworkChanges() {
         networkConnected.observe(this@MainActivity) {
-            viewModel.updateNetworkStatus(it)
+            mainViewModel.updateNetworkStatus(it)
         }
     }
 
@@ -43,11 +76,6 @@ class MainActivity : AppCompatActivity() {
             .activityModule(ActivityModule(this@MainActivity))
             .build()
             .inject(this@MainActivity)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
 }

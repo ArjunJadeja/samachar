@@ -1,9 +1,0 @@
-<resources>
-    <string name="app_name">Samachar</string>
-    <string name="back_to_top">back to top</string>
-    <string name="no_data_found">No data found!</string>
-    <string name="select_news_source">Select News Source</string>
-    <string name="no_internet_connection">No internet connection</string>
-    <string name="choose_language">Choose Language</string>
-    <string name="select">Select</string>
-</resources>
