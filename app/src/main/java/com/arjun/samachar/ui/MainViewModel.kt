@@ -2,7 +2,7 @@ package com.arjun.samachar.ui
 
 import androidx.lifecycle.ViewModel
 import com.arjun.samachar.data.model.Country
-import com.arjun.samachar.data.model.HeadlinesParams
+import com.arjun.samachar.data.remote.model.HeadlinesParams
 import com.arjun.samachar.utils.AppConstants.DEFAULT_LANGUAGE_CODE
 import com.arjun.samachar.utils.AppConstants.DEFAULT_SOURCE
 import dagger.hilt.android.lifecycle.HiltViewModel

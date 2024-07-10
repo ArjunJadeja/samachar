@@ -9,12 +9,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.arjun.samachar.ui.MainViewModel
+import com.arjun.samachar.ui.headlines.bookmark.BookmarksScreen
 import com.arjun.samachar.ui.headlines.home.HomeScreen
+import com.arjun.samachar.ui.headlines.offline.OfflineScreen
 import com.arjun.samachar.ui.headlines.search.SearchScreen
 
 sealed class Route(val name: String) {
     data object HomeScreen : Route(name = "home_screen")
     data object SearchScreen : Route(name = "search_screen")
+    data object BookmarksScreen : Route(name = "bookmarks_screen")
+    data object OfflineScreen : Route(name = "offline_screen")
 }
 
 @Composable
@@ -44,9 +48,28 @@ fun AppNavHost(
         }
         composable(route = Route.SearchScreen.name) {
             SearchScreen(
+                context = context,
                 navController = navController,
                 mainViewModel = mainViewModel
             ) {
+                openCustomChromeTab(
+                    customTabsIntent = customTabsIntent,
+                    context = context,
+                    url = it
+                )
+            }
+        }
+        composable(route = Route.BookmarksScreen.name) {
+            BookmarksScreen(context = context, navController = navController) {
+                openCustomChromeTab(
+                    customTabsIntent = customTabsIntent,
+                    context = context,
+                    url = it
+                )
+            }
+        }
+        composable(route = Route.OfflineScreen.name) {
+            OfflineScreen(context = context, navController = navController) {
                 openCustomChromeTab(
                     customTabsIntent = customTabsIntent,
                     context = context,

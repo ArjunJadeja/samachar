@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.arjun.samachar.R
-import com.arjun.samachar.data.model.HeadlinesParams
+import com.arjun.samachar.data.remote.model.HeadlinesParams
 import com.arjun.samachar.ui.MainViewModel
 import com.arjun.samachar.ui.base.NoNetworkStatusBar
 import com.arjun.samachar.ui.base.ClickHandler
@@ -57,7 +58,9 @@ import com.arjun.samachar.ui.headlines.LoadHeadlines
 import com.arjun.samachar.utils.AppConstants.DEFAULT_LANGUAGE_CODE
 import com.arjun.samachar.utils.AppConstants.DEFAULT_SOURCE
 import com.arjun.samachar.utils.StringsHelper.APP_NAME
+import com.arjun.samachar.utils.StringsHelper.BOOKMARKED_NEWS
 import com.arjun.samachar.utils.StringsHelper.LANGUAGE_BUTTON
+import com.arjun.samachar.utils.StringsHelper.SAVED_TO_BOOKMARK
 import com.arjun.samachar.utils.StringsHelper.SEARCH_BUTTON
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -160,22 +163,35 @@ fun HomeScreen(
                 showLanguagesBottomSheet = { showLanguagesBottomSheet = it },
                 showCountriesBottomSheet = { showCountriesBottomSheet = it }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate(Route.BookmarksScreen.name) }) {
+                Icon(
+                    painter = painterResource(R.drawable.bookmarks),
+                    contentDescription = BOOKMARKED_NEWS
+                )
+            }
         }
     ) { innerPadding ->
 
         Column(modifier = Modifier.padding(innerPadding)) {
 
             if (!networkConnectedState) {
-                NoNetworkStatusBar()
+                NoNetworkStatusBar { navController.navigate(Route.OfflineScreen.name) }
+            } else {
+                SelectNewsSourceButton { showSourcesBottomSheet = true }
             }
-
-            SelectNewsSourceButton { showSourcesBottomSheet = true }
 
             Box(modifier = Modifier.fillMaxSize()) {
                 LoadHeadlines(
                     headlinesState = headlinesState,
                     isNetworkConnected = networkConnectedState,
+                    bookmarkIcon = painterResource(id = R.drawable.add),
                     onHeadlineClicked = { onHeadlineClicked(it.url) },
+                    onBookmarkClicked = {
+                        homeViewModel.bookmarkHeadline(it)
+                        Toast.makeText(context, SAVED_TO_BOOKMARK, Toast.LENGTH_SHORT).show()
+                    },
                     onRetryClicked = {
                         fetchHeadlines(
                             headlinesParams = headlinesParamsState,

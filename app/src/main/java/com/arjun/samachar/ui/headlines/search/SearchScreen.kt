@@ -1,5 +1,7 @@
 package com.arjun.samachar.ui.headlines.search
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,17 +26,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.arjun.samachar.R
 import com.arjun.samachar.ui.MainViewModel
 import com.arjun.samachar.ui.base.BackButton
 import com.arjun.samachar.ui.base.ClickHandler
 import com.arjun.samachar.ui.base.NoNetworkStatusBar
+import com.arjun.samachar.ui.base.Route
 import com.arjun.samachar.ui.base.SearchHandler
 import com.arjun.samachar.ui.headlines.LoadHeadlines
+import com.arjun.samachar.utils.StringsHelper.SAVED_TO_BOOKMARK
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -43,6 +49,7 @@ import kotlinx.coroutines.flow.filter
 
 @Composable
 fun SearchScreen(
+    context: Context,
     navController: NavController,
     mainViewModel: MainViewModel,
     searchViewModel: SearchViewModel = hiltViewModel(),
@@ -68,7 +75,7 @@ fun SearchScreen(
         Column(modifier = Modifier.padding(innerPadding)) {
 
             if (!networkConnectedState) {
-                NoNetworkStatusBar()
+                NoNetworkStatusBar { navController.navigate(Route.OfflineScreen.name) }
             }
 
             if (searchQuery.isNotEmpty()) {
@@ -76,7 +83,12 @@ fun SearchScreen(
                     LoadHeadlines(
                         headlinesState = searchedHeadlinesState,
                         isNetworkConnected = networkConnectedState,
+                        bookmarkIcon = painterResource(id = R.drawable.add),
                         onHeadlineClicked = { onHeadlineClicked(it.url) },
+                        onBookmarkClicked = {
+                            searchViewModel.bookmarkHeadline(it)
+                            Toast.makeText(context, SAVED_TO_BOOKMARK, Toast.LENGTH_SHORT).show()
+                        },
                         onRetryClicked = { searchViewModel.search(searchViewModel.queryText.value) }
                     )
                 }

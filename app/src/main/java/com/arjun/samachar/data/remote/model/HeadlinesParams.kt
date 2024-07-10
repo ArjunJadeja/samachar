@@ -1,5 +1,6 @@
-package com.arjun.samachar.data.model
+package com.arjun.samachar.data.remote.model
 
+import com.arjun.samachar.data.model.Country
 import com.arjun.samachar.utils.AppConstants.DEFAULT_COUNTRY_CODE
 import com.arjun.samachar.utils.AppConstants.DEFAULT_COUNTRY_FLAG
 import com.arjun.samachar.utils.AppConstants.DEFAULT_COUNTRY_NAME

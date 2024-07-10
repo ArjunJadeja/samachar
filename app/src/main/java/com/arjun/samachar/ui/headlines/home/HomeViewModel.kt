@@ -2,7 +2,7 @@ package com.arjun.samachar.ui.headlines.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arjun.samachar.data.model.Headline
+import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
 import com.arjun.samachar.ui.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,6 +55,12 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
                 countryCode = countryCode,
                 languageCode = languageCode
             ).handleNewsListUpdate()
+        }
+    }
+
+    fun bookmarkHeadline(headline: Headline) {
+        viewModelScope.launch {
+            repository.bookmarkHeadline(headline = headline)
         }
     }
 

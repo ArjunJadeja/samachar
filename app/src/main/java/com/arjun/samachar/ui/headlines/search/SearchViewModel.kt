@@ -2,7 +2,7 @@ package com.arjun.samachar.ui.headlines.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arjun.samachar.data.model.Headline
+import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
 import com.arjun.samachar.ui.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,6 +50,12 @@ class SearchViewModel @Inject constructor(private val repository: MainRepository
 
     fun clearHeadlines() {
         _searchedHeadlines.update { UiState.Loading }
+    }
+
+    fun bookmarkHeadline(headline: Headline) {
+        viewModelScope.launch {
+            repository.bookmarkHeadline(headline = headline)
+        }
     }
 
 }

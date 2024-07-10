@@ -2,7 +2,7 @@ package com.arjun.samachar.ui.filters.source
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arjun.samachar.data.model.Source
+import com.arjun.samachar.data.remote.model.Source
 import com.arjun.samachar.data.repository.MainRepository
 import com.arjun.samachar.ui.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel

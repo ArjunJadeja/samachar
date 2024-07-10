@@ -1,4 +1,4 @@
-package com.arjun.samachar.data.api
+package com.arjun.samachar.data.remote
 
 import com.arjun.samachar.utils.AppConstants.API_KEY
 import okhttp3.Interceptor
