@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.arjun.samachar.data.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
 import com.arjun.samachar.ui.base.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,8 +13,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel(private val repository: MainRepository) : ViewModel() {
+@HiltViewModel
+class SearchViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
 
     private val _searchedHeadlines = MutableStateFlow<UiState<List<Headline>>>(UiState.Loading)
 

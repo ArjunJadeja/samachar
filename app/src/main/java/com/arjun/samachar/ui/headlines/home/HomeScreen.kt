@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.arjun.samachar.R
 import com.arjun.samachar.data.model.HeadlinesParams
@@ -66,10 +67,10 @@ fun HomeScreen(
     context: Context,
     navController: NavController,
     mainViewModel: MainViewModel,
-    homeViewModel: HomeViewModel,
-    languageViewModel: LanguageViewModel,
-    countriesViewModel: CountriesViewModel,
-    sourcesViewModel: SourcesViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    languageViewModel: LanguageViewModel = hiltViewModel(),
+    countriesViewModel: CountriesViewModel = hiltViewModel(),
+    sourcesViewModel: SourcesViewModel = hiltViewModel(),
     onHeadlineClicked: UrlHandler
 ) {
     val networkConnectedState by mainViewModel.isNetworkConnected.collectAsState()

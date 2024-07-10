@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.arjun.samachar.data.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
 import com.arjun.samachar.ui.base.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -14,8 +15,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel(private val repository: MainRepository) : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
 
     private val _headlineList = MutableStateFlow<UiState<List<Headline>>>(UiState.Loading)
 

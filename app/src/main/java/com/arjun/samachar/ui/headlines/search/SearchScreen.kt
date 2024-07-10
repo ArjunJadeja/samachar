@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.arjun.samachar.ui.MainViewModel
 import com.arjun.samachar.ui.base.BackButton
@@ -44,7 +45,7 @@ import kotlinx.coroutines.flow.filter
 fun SearchScreen(
     navController: NavController,
     mainViewModel: MainViewModel,
-    searchViewModel: SearchViewModel,
+    searchViewModel: SearchViewModel = hiltViewModel(),
     onHeadlineClicked: (String) -> Unit
 ) {
     val networkConnectedState by mainViewModel.isNetworkConnected.collectAsState()
@@ -52,8 +53,6 @@ fun SearchScreen(
     val searchedHeadlinesState by searchViewModel.searchedHeadlines.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
-
-    LaunchedEffect(true) { searchViewModel.clearHeadlines() }
 
     LaunchedEffect(searchQuery) { searchViewModel.search(query = searchQuery) }
 
