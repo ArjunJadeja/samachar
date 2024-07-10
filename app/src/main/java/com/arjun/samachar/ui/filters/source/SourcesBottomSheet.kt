@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arjun.samachar.data.model.Source
+import com.arjun.samachar.data.remote.model.Source
 import com.arjun.samachar.ui.MainViewModel
 import com.arjun.samachar.ui.base.DismissHandler
 import com.arjun.samachar.ui.base.ProgressLoading
@@ -64,7 +64,7 @@ fun LoadSources(
                 SourceList(sourceList = sourcesState.data) { source ->
                     mainViewModel.apply {
                         clearSelectedLanguage()
-                        updateSelectedSource(source.id)
+                        updateSelectedSource(source.sourceId)
                     }
                     onDismiss()
                 }
@@ -93,7 +93,7 @@ fun SourceList(
 ) {
     val updatedSourceList = listOf(Source()) + sourceList
     LazyColumn(modifier = Modifier.padding(bottom = 16.dp)) {
-        items(updatedSourceList, key = { source -> source.id }) { source ->
+        items(updatedSourceList, key = { source -> source.sourceId }) { source ->
             SourceItem(source = source) { onSourceSelected(it) }
         }
     }
@@ -109,7 +109,7 @@ fun SourceItem(
             .fillMaxWidth()
             .padding(16.dp)
             .clickable { onSourceSelected(source) },
-        text = source.name,
+        text = source.sourceName,
         textAlign = TextAlign.Center,
         fontSize = 18.sp
     )

@@ -1,7 +1,7 @@
-package com.arjun.samachar.data.api
+package com.arjun.samachar.data.remote
 
-import com.arjun.samachar.data.model.HeadlinesResponse
-import com.arjun.samachar.data.model.SourcesResponse
+import com.arjun.samachar.data.remote.model.HeadlinesResponse
+import com.arjun.samachar.data.remote.model.SourcesResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 import javax.inject.Singleton

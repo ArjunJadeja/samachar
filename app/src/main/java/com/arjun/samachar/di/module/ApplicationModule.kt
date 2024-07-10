@@ -2,8 +2,12 @@ package com.arjun.samachar.di.module
 
 import android.content.Context
 import androidx.browser.customtabs.CustomTabsIntent
-import com.arjun.samachar.data.api.AuthInterceptor
-import com.arjun.samachar.data.api.NetworkService
+import androidx.room.Room
+import com.arjun.samachar.data.local.AppDatabase
+import com.arjun.samachar.data.local.AppDatabaseService
+import com.arjun.samachar.data.local.DatabaseService
+import com.arjun.samachar.data.remote.AuthInterceptor
+import com.arjun.samachar.data.remote.NetworkService
 import com.arjun.samachar.utils.network.NetworkConnected
 import dagger.Module
 import dagger.Provides
@@ -57,6 +61,22 @@ class ApplicationModule {
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
             .create(NetworkService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context = context,
+            klass = AppDatabase::class.java,
+            name = "samachar_database"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideDatabaseService(appDatabase: AppDatabase): DatabaseService {
+        return AppDatabaseService(appDatabase)
     }
 
 }

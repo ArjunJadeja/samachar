@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +33,7 @@ import com.arjun.samachar.utils.StringsHelper.BACK_BUTTON
 import com.arjun.samachar.utils.StringsHelper.NO_DATA_FOUND
 import com.arjun.samachar.utils.StringsHelper.NO_INTERNET_CONNECTION
 import com.arjun.samachar.utils.StringsHelper.RETRY
+import com.arjun.samachar.utils.StringsHelper.VIEW_NEWS_OFFLINE
 
 @Composable
 fun PrimaryButton(modifier: Modifier, text: String, onClick: ClickHandler) {
@@ -112,8 +114,10 @@ fun ShowErrorDialog(
 }
 
 @Composable
-fun NoNetworkStatusBar() {
-    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
+fun NoNetworkStatusBar(onViewOfflineHeadlinesClick: ClickHandler) {
+    Column(
+        modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center
+    ) {
         Text(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
@@ -121,7 +125,18 @@ fun NoNetworkStatusBar() {
             text = NO_INTERNET_CONNECTION,
             fontSize = 14.sp
         )
+
         HorizontalDivider()
+
+        Text(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(8.dp)
+                .clickable { onViewOfflineHeadlinesClick() },
+            text = VIEW_NEWS_OFFLINE,
+            fontSize = 14.sp,
+            textDecoration = TextDecoration.Underline
+        )
     }
 }
 
@@ -193,7 +208,7 @@ fun ApiRetryAlertPreview() {
 @Preview(showBackground = true)
 @Composable
 fun NoNetworkStatusBarPreview() {
-    NoNetworkStatusBar()
+    NoNetworkStatusBar {}
 }
 
 @Preview(showBackground = true)
