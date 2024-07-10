@@ -26,12 +26,19 @@ class ApplicationModule(private val application: App) {
     @Provides
     fun provideNetworkService(): NetworkService {
         val baseUrl = "https://newsapi.org/v2/"
+
         val authInterceptor = AuthInterceptor()
+
         val client = OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .build()
+
         val contentType = "application/json".toMediaType()
-        val json = Json { ignoreUnknownKeys = true }
+
+        val json = Json {
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+        }
 
         return Retrofit.Builder()
             .baseUrl(baseUrl)

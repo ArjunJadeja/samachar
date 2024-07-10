@@ -25,16 +25,24 @@ class MainRepository @Inject constructor(private val networkService: NetworkServ
     }
 
     fun getHeadlinesByCountry(countryCode: String): Flow<List<Headline>> {
-        return flow { emit(networkService.getHeadlinesByCountry(countryCode = countryCode)) }
-            .map { it.headlines }
+        return flow { emit(networkService.getHeadlinesByCountry(countryCode = countryCode).headlines) }
+            .map { headlines ->
+                headlines.filter { it.title.uppercase() != "[REMOVED]" }
+            }
     }
 
     fun search(query: String): Flow<List<Headline>> {
-        return flow { emit(networkService.search(query = query)) }.map { it.headlines }
+        return flow { emit(networkService.search(query = query).headlines) }
+            .map { headlines ->
+                headlines.filter { it.title.uppercase() != "[REMOVED]" }
+            }
     }
 
     fun getHeadlinesBySource(sourceId: String): Flow<List<Headline>> {
-        return flow { emit(networkService.getHeadlinesBySource(sourceId = sourceId)) }.map { it.headlines }
+        return flow { emit(networkService.getHeadlinesBySource(sourceId = sourceId).headlines) }
+            .map { headlines ->
+                headlines.filter { it.title.uppercase() != "[REMOVED]" }
+            }
     }
 
     fun getHeadlinesByLanguage(countryCode: String, languageCode: String): Flow<List<Headline>> {
@@ -43,9 +51,11 @@ class MainRepository @Inject constructor(private val networkService: NetworkServ
                 networkService.getHeadlinesByLanguage(
                     countryCode = countryCode,
                     languageCode = languageCode
-                )
+                ).headlines
             )
-        }.map { it.headlines }
+        }.map { headlines ->
+            headlines.filter { it.title.uppercase() != "[REMOVED]" && it.imageUrl.isNotEmpty() }
+        }
     }
 
     fun getSources(countryCode: String): Flow<List<Source>> {
