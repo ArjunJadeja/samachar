@@ -73,7 +73,7 @@ fun LanguagesBottomSheet(
 }
 
 @Composable
-fun LoadLanguages(
+private fun LoadLanguages(
     context: Context,
     languagesState: UiState<List<Language>>,
     selectedLanguage: String,
@@ -114,7 +114,7 @@ fun LoadLanguages(
 }
 
 @Composable
-fun LanguageGrid(
+private fun LanguageGrid(
     languages: List<Language>,
     selectedLanguageCode: String,
     onLanguageSelected: LanguageHandler
@@ -136,7 +136,7 @@ fun LanguageGrid(
 }
 
 @Composable
-fun LanguageItem(language: Language, isSelected: Boolean, onLanguageSelected: LanguageHandler) {
+private fun LanguageItem(language: Language, isSelected: Boolean, onLanguageSelected: LanguageHandler) {
     Surface(
         shape = RoundedCornerShape(14.dp),
         color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onPrimary,

@@ -1,8 +1,6 @@
 package com.arjun.samachar.ui.base
 
-import com.arjun.samachar.data.local.entity.BookmarkHeadline
 import com.arjun.samachar.data.model.Country
-import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.model.Language
 import com.arjun.samachar.data.remote.model.Source
 

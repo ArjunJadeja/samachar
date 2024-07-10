@@ -50,7 +50,7 @@ fun CountriesBottomSheet(
 }
 
 @Composable
-fun LoadCountries(
+private fun LoadCountries(
     context: Context,
     countriesState: UiState<List<Country>>,
     mainViewModel: MainViewModel,
@@ -86,7 +86,7 @@ fun LoadCountries(
 }
 
 @Composable
-fun CountryList(
+private fun CountryList(
     countries: List<Country>,
     onCountrySelected: CountryHandler
 ) {
@@ -98,7 +98,7 @@ fun CountryList(
 }
 
 @Composable
-fun CountryItem(
+private fun CountryItem(
     country: Country,
     onCountrySelected: CountryHandler
 ) {

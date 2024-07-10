@@ -52,7 +52,7 @@ fun SourcesBottomSheet(
 }
 
 @Composable
-fun LoadSources(
+private fun LoadSources(
     context: Context,
     sourcesState: UiState<List<Source>>,
     mainViewModel: MainViewModel,
@@ -87,7 +87,7 @@ fun LoadSources(
 }
 
 @Composable
-fun SourceList(
+private fun SourceList(
     sourceList: List<Source>,
     onSourceSelected: SourceHandler
 ) {
@@ -100,7 +100,7 @@ fun SourceList(
 }
 
 @Composable
-fun SourceItem(
+private fun SourceItem(
     source: Source,
     onSourceSelected: SourceHandler
 ) {
