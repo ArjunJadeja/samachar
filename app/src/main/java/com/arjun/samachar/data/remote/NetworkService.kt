@@ -11,18 +11,24 @@ interface NetworkService {
 
     @GET("top-headlines")
     suspend fun getHeadlinesByCountry(
-        @Query("country") countryCode: String
+        @Query("country") countryCode: String,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
     ): HeadlinesResponse
 
     @GET("top-headlines")
     suspend fun getHeadlinesBySource(
-        @Query("sources") sourceId: String
+        @Query("sources") sourceId: String,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
     ): HeadlinesResponse
 
     @GET("top-headlines")
     suspend fun getHeadlinesByLanguage(
         @Query("country") countryCode: String,
-        @Query("language") languageCode: String
+        @Query("language") languageCode: String,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
     ): HeadlinesResponse
 
     @GET("top-headlines/sources")
@@ -32,7 +38,9 @@ interface NetworkService {
 
     @GET("everything")
     suspend fun search(
-        @Query("q") query: String
+        @Query("q") query: String,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
     ): HeadlinesResponse
 
 }

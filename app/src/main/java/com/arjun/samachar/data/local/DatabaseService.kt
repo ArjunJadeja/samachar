@@ -10,6 +10,8 @@ interface DatabaseService {
 
     fun deleteAllAndInsertAllToCache(headlines: List<Headline>)
 
+    fun cacheAll(headlines: List<Headline>)
+
     fun getBookmarkedHeadlines(): Flow<List<BookmarkHeadline>>
 
     fun bookmarkHeadline(headline: Headline)

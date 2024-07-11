@@ -2,14 +2,13 @@ package com.arjun.samachar.ui.headlines.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
-import com.arjun.samachar.ui.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,9 +17,10 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
 
-    private val _searchedHeadlines = MutableStateFlow<UiState<List<Headline>>>(UiState.Loading)
+    private val _searchedHeadlines =
+        MutableStateFlow<PagingData<Headline>>(value = PagingData.empty())
 
-    val searchedHeadlines: StateFlow<UiState<List<Headline>>> = _searchedHeadlines
+    val searchedHeadlines: StateFlow<PagingData<Headline>> = _searchedHeadlines
 
     private val _queryText = MutableStateFlow("")
 
@@ -35,12 +35,7 @@ class SearchViewModel @Inject constructor(private val repository: MainRepository
         viewModelScope.launch {
             repository.search(query)
                 .flowOn(Dispatchers.IO)
-                .catch { e ->
-                    _searchedHeadlines.value = UiState.Error(e.message.toString())
-                }
-                .collect { articles ->
-                    _searchedHeadlines.value = UiState.Success(articles)
-                }
+                .collect { _searchedHeadlines.value = it }
         }
     }
 
@@ -49,13 +44,11 @@ class SearchViewModel @Inject constructor(private val repository: MainRepository
     }
 
     fun clearHeadlines() {
-        _searchedHeadlines.update { UiState.Loading }
+        _searchedHeadlines.update { PagingData.empty() }
     }
 
     fun bookmarkHeadline(headline: Headline) {
-        viewModelScope.launch {
-            repository.bookmarkHeadline(headline = headline)
-        }
+        viewModelScope.launch { repository.bookmarkHeadline(headline = headline) }
     }
 
 }

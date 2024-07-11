@@ -2,16 +2,16 @@ package com.arjun.samachar.ui.headlines.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
-import com.arjun.samachar.ui.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,17 +20,14 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
 
-    private val _headlineList = MutableStateFlow<UiState<List<Headline>>>(UiState.Loading)
+    private val _headlineList = MutableStateFlow<PagingData<Headline>>(value = PagingData.empty())
 
-    val headlineList: StateFlow<UiState<List<Headline>>> = _headlineList
+    val headlineList: StateFlow<PagingData<Headline>> = _headlineList
 
     private var fetchJob: Job? = null
 
-    fun clearHeadlineList() {
-        _headlineList.update { UiState.Loading }
-    }
-
     private fun launchFetching(block: suspend () -> Unit) {
+        clearHeadlineList()
         fetchJob?.cancel()
         fetchJob = viewModelScope.launch {
             block()
@@ -64,13 +61,14 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
         }
     }
 
-    private suspend fun Flow<List<Headline>>.handleNewsListUpdate() {
+    private suspend fun Flow<PagingData<Headline>>.handleNewsListUpdate() {
         this.flowOn(Dispatchers.IO)
-            .catch { e ->
-                _headlineList.value = UiState.Error(e.toString())
-            }.collect {
-                _headlineList.value = UiState.Success(it)
-            }
+            .cachedIn(viewModelScope)
+            .collect { _headlineList.value = it }
+    }
+
+    private fun clearHeadlineList() {
+        _headlineList.update { PagingData.empty() }
     }
 
 }

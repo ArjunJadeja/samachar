@@ -9,6 +9,8 @@ hilt = "2.50"
 hiltNavigationCompose = "1.2.0"
 lifecycleViewmodelCompose = "2.8.3"
 navigationCompose = "2.7.7"
+pagingCompose = "3.3.0"
+pagingRuntimeKtx = "3.3.0"
 room = "2.6.1"
 serializationPlugin = "1.9.24"
 serializationLibrary = "1.6.3"
@@ -31,6 +33,8 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-material3 = { module = "androidx.compose.material3:material3" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
+androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

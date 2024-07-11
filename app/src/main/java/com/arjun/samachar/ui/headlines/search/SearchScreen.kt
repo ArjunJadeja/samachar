@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.arjun.samachar.R
 import com.arjun.samachar.ui.MainViewModel
 import com.arjun.samachar.ui.base.BackButton
@@ -39,7 +40,7 @@ import com.arjun.samachar.ui.base.ClickHandler
 import com.arjun.samachar.ui.base.NoNetworkStatusBar
 import com.arjun.samachar.ui.base.Route
 import com.arjun.samachar.ui.base.SearchHandler
-import com.arjun.samachar.ui.headlines.LoadHeadlines
+import com.arjun.samachar.ui.headlines.LoadPaginatedHeadlines
 import com.arjun.samachar.utils.StringsHelper.SAVED_TO_BOOKMARK
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,7 +58,7 @@ fun SearchScreen(
 ) {
     val networkConnectedState by mainViewModel.isNetworkConnected.collectAsState()
 
-    val searchedHeadlinesState by searchViewModel.searchedHeadlines.collectAsState()
+    val searchedHeadlinesState = searchViewModel.searchedHeadlines.collectAsLazyPagingItems()
 
     var searchQuery by remember { mutableStateOf("") }
 
@@ -80,8 +81,8 @@ fun SearchScreen(
 
             if (searchQuery.isNotEmpty()) {
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    LoadHeadlines(
-                        headlinesState = searchedHeadlinesState,
+                    LoadPaginatedHeadlines(
+                        headlines = searchedHeadlinesState,
                         isNetworkConnected = networkConnectedState,
                         bookmarkIcon = painterResource(id = R.drawable.add),
                         onHeadlineClicked = { onHeadlineClicked(it.url) },

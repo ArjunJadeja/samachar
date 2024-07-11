@@ -35,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.arjun.samachar.R
 import com.arjun.samachar.data.remote.model.HeadlinesParams
 import com.arjun.samachar.ui.MainViewModel
@@ -54,7 +55,7 @@ import com.arjun.samachar.ui.filters.language.LanguageViewModel
 import com.arjun.samachar.ui.filters.language.LanguagesBottomSheet
 import com.arjun.samachar.ui.filters.source.SourcesBottomSheet
 import com.arjun.samachar.ui.filters.source.SourcesViewModel
-import com.arjun.samachar.ui.headlines.LoadHeadlines
+import com.arjun.samachar.ui.headlines.LoadPaginatedHeadlines
 import com.arjun.samachar.utils.AppConstants.DEFAULT_LANGUAGE_CODE
 import com.arjun.samachar.utils.AppConstants.DEFAULT_SOURCE
 import com.arjun.samachar.utils.StringsHelper.APP_NAME
@@ -80,7 +81,7 @@ fun HomeScreen(
 
     val headlinesParamsState by mainViewModel.headlinesParams.collectAsState()
 
-    val headlinesState by homeViewModel.headlineList.collectAsState()
+    val headlinesState = homeViewModel.headlineList.collectAsLazyPagingItems()
 
     val headlinesListState = rememberLazyListState()
 
@@ -183,8 +184,8 @@ fun HomeScreen(
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
-                LoadHeadlines(
-                    headlinesState = headlinesState,
+                LoadPaginatedHeadlines(
+                    headlines = headlinesState,
                     isNetworkConnected = networkConnectedState,
                     bookmarkIcon = painterResource(id = R.drawable.add),
                     onHeadlineClicked = { onHeadlineClicked(it.url) },
@@ -213,7 +214,6 @@ fun HomeScreen(
 
 private fun fetchHeadlines(headlinesParams: HeadlinesParams, homeViewModel: HomeViewModel) {
     homeViewModel.apply {
-        clearHeadlineList()
         when {
             headlinesParams.selectedLanguageCode != DEFAULT_LANGUAGE_CODE -> {
                 getHeadlinesByLanguage(
