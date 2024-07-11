@@ -31,6 +31,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.arjun.samachar.R
@@ -38,6 +40,7 @@ import com.arjun.samachar.data.model.HeadlineContract
 import com.arjun.samachar.ui.base.MaxFillNoDataFound
 import com.arjun.samachar.ui.base.ClickHandler
 import com.arjun.samachar.ui.base.HeadlineHandler
+import com.arjun.samachar.ui.base.MaxFillProgressLoading
 import com.arjun.samachar.ui.base.NoDataFound
 import com.arjun.samachar.ui.base.ProgressLoading
 import com.arjun.samachar.ui.base.RetryHandler
@@ -58,7 +61,9 @@ fun <T> LoadHeadlines(
     onRetryClicked: RetryHandler,
     listState: LazyListState = rememberLazyListState()
 ) where T : HeadlineContract {
+
     when (headlinesState) {
+
         is UiState.Success -> {
             if (headlinesState.data.isNotEmpty()) {
                 HeadlineList(
@@ -104,9 +109,106 @@ fun <T> HeadlineList(
     onBookmarkClicked: HeadlineHandler<T>,
     listState: LazyListState = rememberLazyListState()
 ) where T : HeadlineContract {
+
     LazyColumn(state = listState) {
+
         items(headlines,
             key = { headline -> "${headline.title}_${headline.url}_${headline.publishedAt}" }) { headline ->
+            HeadlineItem(
+                imageUrl = headline.imageUrl,
+                bookmarkIcon = bookmarkIcon,
+                author = headline.author,
+                title = headline.title,
+                publishedAt = headline.publishedAt,
+                onClick = { onHeadlineClicked(headline) },
+                onBookmarkClicked = { onBookmarkClicked(headline) }
+            )
+        }
+    }
+}
+
+@Composable
+fun <T> LoadPaginatedHeadlines(
+    headlines: LazyPagingItems<T>,
+    isNetworkConnected: Boolean,
+    bookmarkIcon: Painter,
+    onHeadlineClicked: HeadlineHandler<T>,
+    onBookmarkClicked: HeadlineHandler<T>,
+    onRetryClicked: RetryHandler,
+    listState: LazyListState = rememberLazyListState()
+) where T : HeadlineContract {
+
+    PaginatedHeadlineList(
+        headlines = headlines,
+        bookmarkIcon = bookmarkIcon,
+        onHeadlineClicked = onHeadlineClicked,
+        onBookmarkClicked = onBookmarkClicked,
+        listState = listState
+    )
+
+    headlines.apply {
+
+        when {
+
+            loadState.refresh is LoadState.Loading -> {
+                if (isNetworkConnected) {
+                    MaxFillProgressLoading()
+                } else {
+                    MaxFillNoDataFound()
+                }
+            }
+
+            loadState.refresh is LoadState.NotLoading -> {}
+
+            loadState.refresh is LoadState.Error -> {
+                val error = headlines.loadState.refresh as LoadState.Error
+                Box(modifier = Modifier.fillMaxSize()) {
+                    ShowErrorDialog(
+                        header = DIALOG_ERROR_HEADER, message = if (isNetworkConnected) {
+                            error.error.localizedMessage!!
+                        } else {
+                            DIALOG_NETWORK_ERROR
+                        }
+                    ) { onRetryClicked() }
+                }
+            }
+
+            loadState.append is LoadState.Loading -> {
+                if (isNetworkConnected) {
+                    MaxFillProgressLoading()
+                } else {
+                    MaxFillNoDataFound()
+                }
+            }
+
+            loadState.append is LoadState.Error -> {
+                val error = headlines.loadState.refresh as LoadState.Error
+                Box(modifier = Modifier.fillMaxSize()) {
+                    ShowErrorDialog(
+                        header = DIALOG_ERROR_HEADER, message = if (isNetworkConnected) {
+                            error.error.localizedMessage!!
+                        } else {
+                            DIALOG_NETWORK_ERROR
+                        }
+                    ) { onRetryClicked() }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun <T> PaginatedHeadlineList(
+    headlines: LazyPagingItems<T>,
+    bookmarkIcon: Painter,
+    onHeadlineClicked: HeadlineHandler<T>,
+    onBookmarkClicked: HeadlineHandler<T>,
+    listState: LazyListState = rememberLazyListState()
+) where T : HeadlineContract {
+    LazyColumn(state = listState) {
+        items(headlines.itemCount,
+            key = { index -> "${headlines[index]?.source}_${headlines[index]?.url}_${headlines[index]?.publishedAt}" }) { index ->
+            val headline = headlines[index]!!
             HeadlineItem(
                 imageUrl = headline.imageUrl,
                 bookmarkIcon = bookmarkIcon,

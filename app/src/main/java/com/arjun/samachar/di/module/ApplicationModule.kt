@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.arjun.samachar.data.local.AppDatabase
 import com.arjun.samachar.data.local.AppDatabaseService
 import com.arjun.samachar.data.local.DatabaseService
+import com.arjun.samachar.data.paging.HeadlinesPagingSource
 import com.arjun.samachar.data.remote.AuthInterceptor
 import com.arjun.samachar.data.remote.NetworkService
 import com.arjun.samachar.utils.network.NetworkConnected

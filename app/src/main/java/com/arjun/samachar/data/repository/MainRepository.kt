@@ -1,19 +1,24 @@
 package com.arjun.samachar.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.arjun.samachar.data.local.DatabaseService
 import com.arjun.samachar.data.local.entity.BookmarkHeadline
 import com.arjun.samachar.data.remote.NetworkService
 import com.arjun.samachar.data.model.Country
 import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.model.Language
+import com.arjun.samachar.data.paging.HeadlinesPagingSource
+import com.arjun.samachar.data.model.HeadlineQuery
 import com.arjun.samachar.data.remote.model.Source
+import com.arjun.samachar.utils.AppConstants.PAGE_SIZE
 import com.arjun.samachar.utils.CountryHelper
 import com.arjun.samachar.utils.LanguageHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,50 +37,46 @@ class MainRepository @Inject constructor(
         return flow { emit(LanguageHelper.getAllLanguages()) }
     }
 
-    fun getHeadlinesByCountry(countryCode: String): Flow<List<Headline>> {
-        return flow {
-            emit(networkService.getHeadlinesByCountry(countryCode = countryCode).headlines)
-        }.map { headlines ->
-            headlines.filter { it.title.uppercase() != "[REMOVED]" }
-        }.onEach { headlines ->
-            cacheHeadlines(headlines)
-        }
+    fun getHeadlinesByCountry(countryCode: String): Flow<PagingData<Headline>> {
+        return getHeadlines(HeadlineQuery.ByCountry(countryCode = countryCode))
     }
 
-    fun search(query: String): Flow<List<Headline>> {
-        return flow { emit(networkService.search(query = query).headlines) }
-            .map { headlines ->
-                headlines.filter { it.title.uppercase() != "[REMOVED]" }
-            }
+    fun getHeadlinesBySource(sourceId: String): Flow<PagingData<Headline>> {
+        return getHeadlines(HeadlineQuery.BySource(sourceId = sourceId))
     }
 
-    fun getHeadlinesBySource(sourceId: String): Flow<List<Headline>> {
-        return flow { emit(networkService.getHeadlinesBySource(sourceId = sourceId).headlines) }
-            .map { headlines ->
-                headlines.filter { it.title.uppercase() != "[REMOVED]" }
-            }
-    }
-
-    fun getHeadlinesByLanguage(countryCode: String, languageCode: String): Flow<List<Headline>> {
-        return flow {
-            emit(
-                networkService.getHeadlinesByLanguage(
-                    countryCode = countryCode,
-                    languageCode = languageCode
-                ).headlines
+    fun getHeadlinesByLanguage(
+        countryCode: String,
+        languageCode: String
+    ): Flow<PagingData<Headline>> {
+        return getHeadlines(
+            HeadlineQuery.ByLanguage(
+                countryCode = countryCode,
+                languageCode = languageCode
             )
-        }.map { headlines ->
-            headlines.filter { it.title.uppercase() != "[REMOVED]" && it.imageUrl.isNotEmpty() }
-        }
+        )
+    }
+
+    fun search(query: String): Flow<PagingData<Headline>> {
+        return getHeadlines(HeadlineQuery.BySearch(query = query))
+    }
+
+    private fun getHeadlines(headlineQuery: HeadlineQuery): Flow<PagingData<Headline>> {
+        return Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE),
+            pagingSourceFactory = {
+                HeadlinesPagingSource(
+                    networkService = networkService,
+                    databaseService = databaseService,
+                    query = headlineQuery
+                )
+            }
+        ).flow
     }
 
     fun getSources(countryCode: String): Flow<List<Source>> {
         return flow { emit(networkService.getSources(countryCode = countryCode)) }
             .map { it.sources }
-    }
-
-    private fun cacheHeadlines(headlines: List<Headline>) {
-        databaseService.deleteAllAndInsertAllToCache(headlines = headlines)
     }
 
     suspend fun getCachedHeadlines(): Flow<List<Headline>> {

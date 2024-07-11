@@ -14,4 +14,6 @@ object AppConstants {
 
     const val DEFAULT_SOURCE = "All"
 
+    const val PAGE_SIZE = 15
+
 }

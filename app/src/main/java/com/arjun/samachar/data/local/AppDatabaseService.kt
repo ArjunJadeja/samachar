@@ -25,6 +25,11 @@ class AppDatabaseService @Inject constructor(private val appDatabase: AppDatabas
         appDatabase.cacheHeadlinesDao().deleteAllAndInsertAll(headlineCacheList)
     }
 
+    override fun cacheAll(headlines: List<Headline>) {
+        val headlineCacheList = headlines.map { it.toCacheHeadline() }
+        appDatabase.cacheHeadlinesDao().addAll(headlineCacheList)
+    }
+
     override fun getBookmarkedHeadlines(): Flow<List<BookmarkHeadline>> {
         return appDatabase.bookmarkHeadlinesDao().getAll()
     }
