@@ -145,7 +145,11 @@ fun <T> LoadPaginatedHeadlines(
                 HandleHeadlineLoading(isNetworkConnected = isNetworkConnected)
             }
 
-            is LoadState.NotLoading -> {}
+            is LoadState.NotLoading -> {
+                if (headlines.itemCount == 0) {
+                    HandleHeadlineLoading(isNetworkConnected = isNetworkConnected)
+                }
+            }
 
             is LoadState.Error -> {
                 val error = headlines.loadState.refresh as LoadState.Error
