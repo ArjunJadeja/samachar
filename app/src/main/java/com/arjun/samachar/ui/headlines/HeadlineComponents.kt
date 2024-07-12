@@ -41,8 +41,6 @@ import com.arjun.samachar.ui.base.MaxFillNoDataFound
 import com.arjun.samachar.ui.base.ClickHandler
 import com.arjun.samachar.ui.base.HeadlineHandler
 import com.arjun.samachar.ui.base.MaxFillProgressLoading
-import com.arjun.samachar.ui.base.NoDataFound
-import com.arjun.samachar.ui.base.ProgressLoading
 import com.arjun.samachar.ui.base.RetryHandler
 import com.arjun.samachar.ui.base.ShowErrorDialog
 import com.arjun.samachar.ui.base.UiState
@@ -79,13 +77,7 @@ fun <T> LoadHeadlines(
         }
 
         is UiState.Loading -> {
-            Box(modifier = Modifier.fillMaxSize()) {
-                if (isNetworkConnected) {
-                    ProgressLoading(modifier = Modifier.align(Alignment.Center))
-                } else {
-                    NoDataFound(modifier = Modifier.align(Alignment.Center))
-                }
-            }
+            HandleHeadlineLoading(isNetworkConnected = isNetworkConnected)
         }
 
         is UiState.Error -> {
@@ -148,19 +140,14 @@ fun <T> LoadPaginatedHeadlines(
 
     headlines.apply {
 
-        when {
-
-            loadState.refresh is LoadState.Loading -> {
-                if (isNetworkConnected) {
-                    MaxFillProgressLoading()
-                } else {
-                    MaxFillNoDataFound()
-                }
+        when (loadState.refresh) { // Initial loading
+            is LoadState.Loading -> {
+                HandleHeadlineLoading(isNetworkConnected = isNetworkConnected)
             }
 
-            loadState.refresh is LoadState.NotLoading -> {}
+            is LoadState.NotLoading -> {}
 
-            loadState.refresh is LoadState.Error -> {
+            is LoadState.Error -> {
                 val error = headlines.loadState.refresh as LoadState.Error
                 Box(modifier = Modifier.fillMaxSize()) {
                     ShowErrorDialog(
@@ -172,27 +159,14 @@ fun <T> LoadPaginatedHeadlines(
                     ) { onRetryClicked() }
                 }
             }
+        }
 
-            loadState.append is LoadState.Loading -> {
-                if (isNetworkConnected) {
-                    MaxFillProgressLoading()
-                } else {
-                    MaxFillNoDataFound()
-                }
-            }
+        when (loadState.append) { // Subsequent loading
+            is LoadState.Loading -> {}
 
-            loadState.append is LoadState.Error -> {
-                val error = headlines.loadState.refresh as LoadState.Error
-                Box(modifier = Modifier.fillMaxSize()) {
-                    ShowErrorDialog(
-                        header = DIALOG_ERROR_HEADER, message = if (isNetworkConnected) {
-                            error.error.localizedMessage!!
-                        } else {
-                            DIALOG_NETWORK_ERROR
-                        }
-                    ) { onRetryClicked() }
-                }
-            }
+            is LoadState.NotLoading -> {}
+
+            is LoadState.Error -> {}
         }
     }
 }
@@ -260,6 +234,15 @@ fun HeadlineItem(
         Spacer(modifier = Modifier.height(16.dp))
 
         HorizontalDivider(thickness = 1.dp)
+    }
+}
+
+@Composable
+fun HandleHeadlineLoading(isNetworkConnected: Boolean) {
+    if (isNetworkConnected) {
+        MaxFillProgressLoading()
+    } else {
+        MaxFillNoDataFound()
     }
 }
 
