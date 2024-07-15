@@ -22,12 +22,30 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        applicationVariants.all {
+            val variant = this
+            variant.outputs
+                .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+                .forEach { output ->
+                    val outputFileName = "Samachar-${variant.baseName}.apk"
+                    output.outputFileName = outputFileName
+                }
         }
     }
     compileOptions {
