@@ -72,9 +72,16 @@ dependencies {
     implementation(libs.androidx.paging.compose)
 
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.turbine)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    debugImplementation(libs.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

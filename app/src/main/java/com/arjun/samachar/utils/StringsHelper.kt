@@ -2,6 +2,7 @@ package com.arjun.samachar.utils
 
 object StringsHelper {
     const val APP_NAME = "Samachar"
+    const val LOADING = "loading"
     const val BACK_TO_TOP = "back to top"
     const val NO_DATA_FOUND = "No data found!"
     const val SELECT_NEWS_SOURCE = "Select News Source"
