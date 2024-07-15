@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.arjun.samachar.R
 import com.arjun.samachar.utils.StringsHelper.BACK_BUTTON
+import com.arjun.samachar.utils.StringsHelper.LOADING
 import com.arjun.samachar.utils.StringsHelper.NO_DATA_FOUND
 import com.arjun.samachar.utils.StringsHelper.NO_INTERNET_CONNECTION
 import com.arjun.samachar.utils.StringsHelper.RETRY
@@ -90,7 +93,7 @@ fun MaxFillProgressLoading() {
 @Composable
 fun ProgressLoading(modifier: Modifier) {
     CircularProgressIndicator(
-        modifier = modifier,
+        modifier = modifier.semantics { contentDescription = LOADING },
         color = colorScheme.secondary,
         trackColor = colorScheme.surfaceVariant,
     )

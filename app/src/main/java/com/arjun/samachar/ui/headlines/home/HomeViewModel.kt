@@ -6,8 +6,8 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
+import com.arjun.samachar.utils.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val repository: MainRepository,
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModel() {
 
     private val _headlineList = MutableStateFlow<PagingData<Headline>>(value = PagingData.empty())
 
@@ -29,7 +32,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
     private fun launchFetching(block: suspend () -> Unit) {
         clearHeadlineList()
         fetchJob?.cancel()
-        fetchJob = viewModelScope.launch {
+        fetchJob = viewModelScope.launch(dispatcherProvider.main) {
             block()
         }
     }
@@ -62,7 +65,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
     }
 
     private suspend fun Flow<PagingData<Headline>>.handleNewsListUpdate() {
-        this.flowOn(Dispatchers.IO)
+        this.flowOn(dispatcherProvider.io)
             .cachedIn(viewModelScope)
             .collect { _headlineList.value = it }
     }

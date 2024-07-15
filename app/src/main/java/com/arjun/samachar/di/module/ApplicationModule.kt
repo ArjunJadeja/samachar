@@ -9,6 +9,8 @@ import com.arjun.samachar.data.local.DatabaseService
 import com.arjun.samachar.data.paging.HeadlinesPagingSource
 import com.arjun.samachar.data.remote.AuthInterceptor
 import com.arjun.samachar.data.remote.NetworkService
+import com.arjun.samachar.utils.DefaultDispatcherProvider
+import com.arjun.samachar.utils.DispatcherProvider
 import com.arjun.samachar.utils.network.NetworkConnected
 import dagger.Module
 import dagger.Provides
@@ -79,5 +81,9 @@ class ApplicationModule {
     fun provideDatabaseService(appDatabase: AppDatabase): DatabaseService {
         return AppDatabaseService(appDatabase)
     }
+
+    @Provides
+    @Singleton
+    fun provideDispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
 
 }

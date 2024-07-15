@@ -6,7 +6,7 @@ import com.arjun.samachar.data.local.DatabaseService
 import com.arjun.samachar.data.model.HeadlineQuery
 import com.arjun.samachar.data.remote.NetworkService
 import com.arjun.samachar.data.remote.model.Headline
-import kotlinx.coroutines.Dispatchers
+import com.arjun.samachar.utils.DispatcherProvider
 import kotlinx.coroutines.withContext
 import javax.inject.Singleton
 
@@ -14,6 +14,7 @@ import javax.inject.Singleton
 class HeadlinesPagingSource(
     private val networkService: NetworkService,
     private val databaseService: DatabaseService,
+    private val dispatcherProvider: DispatcherProvider,
     private val query: HeadlineQuery
 ) : PagingSource<Int, Headline>() {
 
@@ -62,7 +63,7 @@ class HeadlinesPagingSource(
             val filteredHeadlines =
                 response.headlines.filter { it.title.uppercase() != "[REMOVED]" }
 
-            withContext(Dispatchers.IO) {
+            withContext(dispatcherProvider.io) {
                 if (query is HeadlineQuery.ByCountry) {
                     if (position == 1) {
                         databaseService.deleteAllAndInsertAllToCache(headlines = filteredHeadlines)
