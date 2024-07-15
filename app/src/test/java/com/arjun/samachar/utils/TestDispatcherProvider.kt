@@ -1,6 +1,5 @@
-package com.arjun.samachar
+package com.arjun.samachar.utils
 
-import com.arjun.samachar.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
