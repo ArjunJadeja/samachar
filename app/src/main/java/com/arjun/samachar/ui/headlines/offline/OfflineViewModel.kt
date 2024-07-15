@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
 import com.arjun.samachar.ui.base.UiState
+import com.arjun.samachar.utils.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -15,7 +15,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OfflineViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
+class OfflineViewModel @Inject constructor(
+    private val repository: MainRepository,
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModel() {
 
     private val _headlineList = MutableStateFlow<UiState<List<Headline>>>(UiState.Loading)
 
@@ -26,9 +29,9 @@ class OfflineViewModel @Inject constructor(private val repository: MainRepositor
     }
 
     private fun getCachedHeadlines() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.main) {
             repository.getCachedHeadlines()
-                .flowOn(Dispatchers.IO)
+                .flowOn(dispatcherProvider.io)
                 .catch { e ->
                     _headlineList.value = UiState.Error(e.toString())
                 }.collect {

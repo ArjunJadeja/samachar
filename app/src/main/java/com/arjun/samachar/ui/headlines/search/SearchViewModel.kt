@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.arjun.samachar.data.remote.model.Headline
 import com.arjun.samachar.data.repository.MainRepository
+import com.arjun.samachar.utils.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
@@ -15,7 +15,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
+class SearchViewModel @Inject constructor(
+    private val repository: MainRepository,
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModel() {
 
     private val _searchedHeadlines =
         MutableStateFlow<PagingData<Headline>>(value = PagingData.empty())
@@ -32,9 +35,9 @@ class SearchViewModel @Inject constructor(private val repository: MainRepository
 
         clearHeadlines()
 
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.main) {
             repository.search(query)
-                .flowOn(Dispatchers.IO)
+                .flowOn(dispatcherProvider.io)
                 .collect { _searchedHeadlines.value = it }
         }
     }

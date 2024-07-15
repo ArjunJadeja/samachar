@@ -14,8 +14,8 @@ import com.arjun.samachar.data.model.HeadlineQuery
 import com.arjun.samachar.data.remote.model.Source
 import com.arjun.samachar.utils.AppConstants.PAGE_SIZE
 import com.arjun.samachar.utils.CountryHelper
+import com.arjun.samachar.utils.DispatcherProvider
 import com.arjun.samachar.utils.LanguageHelper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -26,7 +26,8 @@ import javax.inject.Singleton
 @Singleton
 class MainRepository @Inject constructor(
     private val networkService: NetworkService,
-    private val databaseService: DatabaseService
+    private val databaseService: DatabaseService,
+    private val dispatcherProvider: DispatcherProvider
 ) {
 
     fun getAllCountries(): Flow<List<Country>> {
@@ -68,6 +69,7 @@ class MainRepository @Inject constructor(
                 HeadlinesPagingSource(
                     networkService = networkService,
                     databaseService = databaseService,
+                    dispatcherProvider = dispatcherProvider,
                     query = headlineQuery
                 )
             }
@@ -80,19 +82,19 @@ class MainRepository @Inject constructor(
     }
 
     suspend fun getCachedHeadlines(): Flow<List<Headline>> {
-        return withContext(Dispatchers.IO) { databaseService.getCachedHeadlines() }
+        return withContext(dispatcherProvider.io) { databaseService.getCachedHeadlines() }
     }
 
     suspend fun bookmarkHeadline(headline: Headline) {
-        withContext(Dispatchers.IO) { databaseService.bookmarkHeadline(headline = headline) }
+        withContext(dispatcherProvider.io) { databaseService.bookmarkHeadline(headline = headline) }
     }
 
     suspend fun removeFromBookmarkedHeadlines(headline: BookmarkHeadline) {
-        withContext(Dispatchers.IO) { databaseService.removeFromBookmarkedHeadlines(headline = headline) }
+        withContext(dispatcherProvider.io) { databaseService.removeFromBookmarkedHeadlines(headline = headline) }
     }
 
     suspend fun getBookmarkedHeadlines(): Flow<List<BookmarkHeadline>> {
-        return withContext(Dispatchers.IO) { databaseService.getBookmarkedHeadlines() }
+        return withContext(dispatcherProvider.io) { databaseService.getBookmarkedHeadlines() }
     }
 
 }
