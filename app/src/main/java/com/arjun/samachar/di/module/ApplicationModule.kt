@@ -6,9 +6,11 @@ import androidx.room.Room
 import com.arjun.samachar.data.local.AppDatabase
 import com.arjun.samachar.data.local.AppDatabaseService
 import com.arjun.samachar.data.local.DatabaseService
-import com.arjun.samachar.data.paging.HeadlinesPagingSource
 import com.arjun.samachar.data.remote.AuthInterceptor
 import com.arjun.samachar.data.remote.NetworkService
+import com.arjun.samachar.di.ApiKey
+import com.arjun.samachar.di.BaseUrl
+import com.arjun.samachar.utils.AppConstants.API_KEY
 import com.arjun.samachar.utils.DefaultDispatcherProvider
 import com.arjun.samachar.utils.DispatcherProvider
 import com.arjun.samachar.utils.network.NetworkConnected
@@ -40,12 +42,25 @@ class ApplicationModule {
         return CustomTabsIntent.Builder().build()
     }
 
+    @BaseUrl
     @Singleton
     @Provides
-    fun provideNetworkService(): NetworkService {
-        val baseUrl = "https://newsapi.org/v2/"
+    fun provideBaseUrl(): String {
+        return "https://newsapi.org/v2/"
+    }
 
-        val authInterceptor = AuthInterceptor()
+    @ApiKey
+    @Singleton
+    @Provides
+    fun provideApiKey(): String {
+        return API_KEY
+    }
+
+    @Singleton
+    @Provides
+    fun provideNetworkService(@BaseUrl baseUrl: String, @ApiKey apiKey: String): NetworkService {
+
+        val authInterceptor = AuthInterceptor(apiKey = apiKey)
 
         val client = OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
