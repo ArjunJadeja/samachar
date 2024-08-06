@@ -31,6 +31,40 @@ MVVM architecture and the Repository pattern.
   <img src="assets/SamacharArchitecture.png" width="600"/> 
 </p>
 
+## Package Structure
+
+    com.arjun.samachar    # Root Package
+    .
+    ├── data                        # Data handling layer
+    │   ├── local                   # Local database with Room
+    │   │   ├── dao                 # Data Access Objects
+    │   │   └── entity              # Database entities
+    │   ├── remote                  # Remote data source
+    │   │   ├── api                 # API endpoints
+    │   │   ├── model               # Models for network responses
+    │   │   └── AuthInterceptor.kt  # Network interceptor
+    │   ├── model                   # Model classes
+    │   ├── paging                  # Paging components
+    │   └── repository              # Repository pattern implementation
+    |
+    ├── di                          # Dependency Injection
+    │   ├── module                  # Dagger/Hilt modules
+    │   └── Qualifiers.kt           # Qualifiers for DI
+    |
+    ├── ui                          # User Interface layer
+    │   ├── base                    # Base components
+    │   ├── headlines               # Headlines feature
+    │   │   ├── home                # Home screen components
+    │   │   ├── bookmark            # Bookmark screen components
+    │   │   └── search              # Search screen components
+    │   ├── filters                 # Filter components (country, language, source)
+    │   ├── theme                   # Theming and styles
+    │   ├── MainActivity.kt         # Main Activity
+    │   └── MainViewModel.kt        # Main ViewModel
+    |
+    ├── utils                       # Utility classes and extensions
+    └── App.kt                      # Application class
+
 ## Credits
 - API from [NewsAPI](https://newsapi.org)
 - Icons from [Flaticon](https://www.flaticon.com)
