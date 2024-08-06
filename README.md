@@ -9,6 +9,17 @@
   <img src="assets/SamacharUi.png" width="800"/> 
 </p>
 
+## Major highlights
+
+- **Instant Search**: Implemented using Kotlin Flow with debounce, distinctUntilChanged, and filter operators.
+- **Headlines Filter**: Filter news headlines by country, language, and source.
+- **Offline Mode**: Access news content even when offline.
+- **Bookmark Headlines**: Save and access your favorite news articles for later.
+- **Dependency Injection**: Manage dependencies cleanly and efficiently using Hilt.
+- **Paginated Data Loading**: Efficiently load news articles with pagination support.
+- **API Key Management**: API key handled securely as a header in the interceptor.
+- **Unit Tests**: Unit tests for critical components.
+
 ## Download
 Check out [Releases](https://github.com/ArjunJadeja/Samachar/releases) to download the latest APK.
 
@@ -69,6 +80,13 @@ MVVM architecture and the Repository pattern.
 - API from [NewsAPI](https://newsapi.org)
 - Icons from [Flaticon](https://www.flaticon.com)
 - Illustrations from [Iconsout](https://iconscout.com)
+
+## Contribute
+If you want to contribute to this library, you're always welcome!
+See [Contributing Guidelines](CONTRIBUTING.md).
+
+## Contact
+You can connect with me on [LinkedIn](https://www.linkedin.com/in/arjun-jadeja/)
 
 ## License
 ```xml
