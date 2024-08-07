@@ -21,7 +21,7 @@
 - **Unit Tests**: Unit tests for critical components.
 
 ## Download
-Check out [Releases](https://github.com/ArjunJadeja/Samachar/releases) to download the latest APK.
+Check out [Releases](https://github.com/ArjunJadeja/Samachar/releases) to download the latest APK (1.51 MB).
 
 ## Tech stack & Open-source libraries
 - **Minimum SDK level 26**
@@ -86,7 +86,7 @@ If you want to contribute to this library, you're always welcome!
 See [Contributing Guidelines](CONTRIBUTING.md).
 
 ## Contact
-You can connect with me on [LinkedIn](https://www.linkedin.com/in/arjun-jadeja/)
+Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/arjun-jadeja/)
 
 ## License
 ```xml
