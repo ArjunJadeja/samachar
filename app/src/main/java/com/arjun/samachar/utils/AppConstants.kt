@@ -1,8 +1,10 @@
 package com.arjun.samachar.utils
 
+import com.arjun.samachar.BuildConfig
+
 object AppConstants {
 
-    const val API_KEY = "013f8cfd8b8a4a44a6429ffa49dcb424"
+    const val API_KEY = BuildConfig.API_KEY
 
     const val DEFAULT_COUNTRY_CODE = "IN"
 

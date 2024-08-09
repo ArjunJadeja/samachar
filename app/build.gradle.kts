@@ -24,6 +24,7 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = false
+            buildConfigField("String", "API_KEY", "\"013f8cfd8b8a4a44a6429ffa49dcb424\"")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -32,6 +33,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            buildConfigField("String", "API_KEY", "\"013f8cfd8b8a4a44a6429ffa49dcb424\"")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -57,7 +59,7 @@ android {
     }
     buildFeatures {
         compose = true
-        viewBinding = true
+        buildConfig = true
     }
 }
 
